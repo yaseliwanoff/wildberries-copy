@@ -1,0 +1,12 @@
+@use "mixins" as mix;
+@use "variables" as vars;
+
+@include mix.font-face("Inter", "#{vars.$font-path}Inter", 400);
+
+body {
+  @include mix.font-primary(vars.$base-font-weight);
+  font-size: vars.$base-font-size;
+  line-height: vars.$base-line-height;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
