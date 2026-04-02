@@ -1,0 +1,94 @@
+@mixin disableAnimation {
+  transform: none !important;
+
+  transition: none !important;
+  transition-property: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+
+  scroll-behavior: auto !important;
+}
+
+@mixin acDisableAnimation {
+  @media (prefers-reduced-motion: reduce) {
+    @include disableAnimation;
+  }
+}
+
+@mixin acModeBW {
+  filter: grayscale(100%);
+}
+
+@mixin acModeContrast {
+  filter: invert(100%);
+  background-color: $white !important;
+}
+
+@mixin meterReset {
+  meter {
+    background: none;
+    -webkit-appearance: none;
+  }
+
+  ::-moz-meter-bar {
+    -moz-appearance: none
+  }
+
+  :-moz-meter-optimum::-moz-meter-bar,
+  :-moz-meter-sub-optimum::-moz-meter-bar,
+  :-moz-meter-sub-sub-optimum::-moz-meter-bar {
+    background: none
+  }
+
+
+  meter::-webkit-meter-bar,
+  meter::-webkit-meter-optimum-value,
+  meter::-webkit-meter-suboptimum-value,
+  meter::-webkit-meter-even-less-good-value,
+  meter::-webkit-meter-inner-element {
+    background: none;
+  }
+}
+
+@mixin progressReset {
+  progress,
+  progress[role] {
+    display: block;
+
+    overflow: hidden;
+
+    width: 100%;
+    height: 40px;
+    margin: 0;
+
+    appearance: none;
+    border: none;
+
+    background-size: auto;
+  }
+
+  progress[role]:after {
+    background-image: none;
+  }
+
+  progress[role] strong {
+    display: none;
+  }
+}
+
+@mixin offxAll {
+
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+@mixin offx {
+  overflow-x: hidden;
+}
