@@ -1,0 +1,21 @@
+@use "variables" as vars;
+
+// Миксин для подключения шрифта
+@mixin font-face($font-name, $font-path, $weight: 400, $style: normal) {
+  @font-face {
+    font-family: "#{$font-name}";
+    src: url('#{$font-path}/woff2/#{$font-name}-#{$weight}.woff2') format('woff2'),
+         url('#{$font-path}/woff/#{$font-name}-#{$weight}.woff') format('woff'),
+         url('#{$font-path}/ttf/#{$font-name}-#{$weight}.ttf') format('truetype');
+    font-weight: $weight;
+    font-style: $style;
+    font-display: swap;
+  }
+}
+
+// Миксин для применения шрифта
+@mixin font-primary($weight: 400, $style: normal) {
+  font-family: vars.$font-primary;
+  font-weight: $weight;
+  font-style: $style;
+}
