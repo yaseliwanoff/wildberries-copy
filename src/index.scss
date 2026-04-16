@@ -2,3 +2,17 @@
 @use "./styles/_reset-mixins.scss";
 @use "./styles/_variables.scss";
 @use "./styles/typography";
+
+body {
+  color: #242424;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    padding-inline: 20px;
+  }
+}
