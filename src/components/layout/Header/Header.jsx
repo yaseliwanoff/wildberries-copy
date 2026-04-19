@@ -1,24 +1,43 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 
 import styles from "./Header.module.scss"
 import logo from "../../../../public/asstes/icons/wb-full-white.svg"
 import Camera from "../../icons/Camera"
-import { MapPin, User, ShoppingCart } from "lucide-react"
+import { MapPin, User, ShoppingCart, X, Search } from "lucide-react"
 import { Link } from "react-router-dom"
 
 import Top from "./Top"
 import DefaultModal from "../../ui/Modal/DefaultModal"
+import SearchModal from "../../ui/Modal/SearchModal"
 
 
 const Header = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSearchModalVisible, setIsSearchModalVisible] = useState(false)
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [inputValues, setInputValues] = useState("")
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.offsetHeight)
+    }
+  }, [])
 
   const toggleModalVisible = () => {
     setIsModalVisible(!isModalVisible)
   }
 
+  const toggleSearchModalVisible = () => {
+    setIsSearchModalVisible(true)
+  }
+
+  const clearInputField = () => {
+    setInputValues("");
+  }
+
   return (
-    <header id="header" className={styles.header}>
+    <header ref={headerRef} id="header" className={styles.header}>
       <DefaultModal onClose={() => setIsModalVisible(false)} isVisible={isModalVisible}>
         <h1 className={styles.modal_title}>Войти или создать профиль</h1>
         <button className={styles.modal_code_btn}>Получить код</button>
@@ -39,11 +58,31 @@ const Header = () => {
             <input 
               className={styles.header_bottom_search} 
               type="text" 
-              placeholder="Найти на Wildberries" 
+              placeholder="Найти на Wildberries"
+              onClick={toggleSearchModalVisible}
+              value={inputValues}
+              onChange={(event) => setInputValues(event.target.value)}
             />
-            <button className={styles.header_bottom_btn}>
-              <Camera />
-            </button>
+            {inputValues.length >= 1 ? (
+              <div className={styles.header_btns_wrapper}>
+                <button onClick={clearInputField} className={styles.clear_btn}>
+                  <X size={23} color="#000000" />
+                </button>
+                <button className={styles.search_btn} type="submit">
+                  <Search size={19} color="#a73afd" />
+                </button>
+              </div>
+            ) : (
+              <button className={styles.header_bottom_btn}>
+                <Camera />
+              </button>
+            )}
+            <SearchModal
+              onClose={() => setIsSearchModalVisible(!isSearchModalVisible)}
+              isVisible={isSearchModalVisible}
+              searchingValue={inputValues}
+              headerHeight={headerHeight}
+            />
           </div>
           <div className={styles.header_bottom_buttons}>
             <button className={styles.adress_btn}>
