@@ -3,7 +3,9 @@
 @use "./styles/_variables.scss";
 @use "./styles/typography";
 
-body {
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
   color: #242424;
 }
 
