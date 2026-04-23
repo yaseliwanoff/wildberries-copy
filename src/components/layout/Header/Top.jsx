@@ -1,10 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
-
 import { ChevronDown } from "lucide-react";
 import Map from "../../icons/Map";
 import Fruits from "../../icons/Fruits";
-
 import styles from "./Header.module.scss";
 import {
   NavMenuItems,
@@ -12,51 +10,84 @@ import {
   MoreNavItems,
   BuisnessMenuItems,
 } from "../../../mocks/header/nav";
+import { createPortal } from "react-dom";
+
+const useDropdownPosition = (triggerRef, isOpen) => {
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  const recalculate = useCallback(() => {
+    if (!triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    setPos({
+      top: rect.bottom + 8,
+      left: rect.left,
+    });
+  }, [triggerRef]);
+
+  useEffect(() => {
+    if (isOpen) {
+      recalculate();
+      window.addEventListener("scroll", recalculate, true);
+      window.addEventListener("resize", recalculate);
+      return () => {
+        window.removeEventListener("scroll", recalculate, true);
+        window.removeEventListener("resize", recalculate);
+      };
+    }
+  }, [isOpen, recalculate]);
+
+  return pos;
+};
+
+const FixedDropdown = ({ pos, children, onClose }) => {
+  return createPortal(
+    <div
+      className={styles.dropdown_menu_fixed}
+      style={{ top: pos.top, left: pos.left }}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+};
 
 const Top = () => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isBusinessMenuOpen, setIsBusinessMenuOpen] = useState(false);
-
-  const moreMenuRef = useRef(null);
-  const businessMenuRef = useRef(null);
-
   const [showMoreButton, setShowMoreButton] = useState(window.innerWidth <= 1000);
 
-  // Закрытие "Еще" при клике вне меню
+  const moreButtonRef = useRef(null);
+  const businessButtonRef = useRef(null);
+
+  const moreMenuPos = useDropdownPosition(moreButtonRef, isMoreMenuOpen);
+  const businessMenuPos = useDropdownPosition(businessButtonRef, isBusinessMenuOpen);
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (
+        moreButtonRef.current &&
+        !moreButtonRef.current.contains(e.target)
+      ) {
         setIsMoreMenuOpen(false);
       }
-
       if (
-        businessMenuRef.current &&
-        !businessMenuRef.current.contains(event.target)
+        businessButtonRef.current &&
+        !businessButtonRef.current.contains(e.target)
       ) {
         setIsBusinessMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Отслеживание resize
   useEffect(() => {
     const handleResize = () => {
       const shouldShowMore = window.innerWidth <= 1000;
       setShowMoreButton(shouldShowMore);
-
-      if (!shouldShowMore) {
-        setIsMoreMenuOpen(false);
-      }
-
+      if (!shouldShowMore) setIsMoreMenuOpen(false);
       setIsBusinessMenuOpen(false);
     };
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -66,43 +97,27 @@ const Top = () => {
   const toggleBusinessMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
     setIsBusinessMenuOpen((prev) => {
-      const next = !prev;
-
-      if (next) {
-        setIsMoreMenuOpen(false);
-      }
-
-      return next;
+      if (!prev) setIsMoreMenuOpen(false);
+      return !prev;
     });
   };
 
   const toggleMoreMenu = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
     setIsMoreMenuOpen((prev) => {
-      const next = !prev;
-
-      if (next) {
-        setIsBusinessMenuOpen(false);
-      }
-
-      return next;
+      if (!prev) setIsBusinessMenuOpen(false);
+      return !prev;
     });
   };
 
   const renderNavItem = (nav) => {
-    // Пункт с выпадающим меню
     if (nav.openMenu) {
       return (
-        <li
-          className={styles.top_menu_link}
-          key={nav.id}
-          ref={businessMenuRef}
-        >
+        <li className={styles.top_menu_link} key={nav.id}>
           <button
+            ref={businessButtonRef}
             type="button"
             className={styles.more_button}
             onClick={toggleBusinessMenu}
@@ -114,9 +129,8 @@ const Top = () => {
               className={isBusinessMenuOpen ? styles.chevron_rotated : ""}
             />
           </button>
-
           {isBusinessMenuOpen && (
-            <div className={styles.dropdown_menu}>
+            <FixedDropdown pos={businessMenuPos} onClose={() => setIsBusinessMenuOpen(false)}>
               {BuisnessMenuItems.map((item) => (
                 <NavLink
                   key={item.id}
@@ -127,23 +141,19 @@ const Top = () => {
                   <span>{item.name}</span>
                 </NavLink>
               ))}
-            </div>
+            </FixedDropdown>
           )}
         </li>
       );
     }
 
-    // Обычный пункт меню
     return (
       <li className={styles.top_menu_link} key={nav.id}>
         <NavLink to={nav.link}>
           <span>{nav.name}</span>
-
           <span className={styles.nav_icon}>
             {nav.hasIcon && nav.icon && <nav.icon />}
           </span>
-
-          {nav.openMenu && <ChevronDown size={15} color="#fff" />}
         </NavLink>
       </li>
     );
@@ -163,11 +173,9 @@ const Top = () => {
               {displayedNavItems.map((nav) => renderNavItem(nav))}
 
               {showMoreButton && (
-                <li
-                  className={`${styles.top_menu_link} ${styles.more_menu_item}`}
-                  ref={moreMenuRef}
-                >
+                <li className={`${styles.top_menu_link} ${styles.more_menu_item}`}>
                   <button
+                    ref={moreButtonRef}
                     type="button"
                     className={styles.more_button}
                     onClick={toggleMoreMenu}
@@ -181,7 +189,7 @@ const Top = () => {
                   </button>
 
                   {isMoreMenuOpen && (
-                    <div className={styles.dropdown_menu}>
+                    <FixedDropdown pos={moreMenuPos} onClose={() => setIsMoreMenuOpen(false)}>
                       {MoreNavItems.map((item) => (
                         <NavLink
                           key={item.id}
@@ -193,7 +201,7 @@ const Top = () => {
                           {item.hasIcon && item.icon && <item.icon />}
                         </NavLink>
                       ))}
-                    </div>
+                    </FixedDropdown>
                   )}
                 </li>
               )}
@@ -206,7 +214,6 @@ const Top = () => {
             <span>КЕШБЕК</span>
             <Fruits />
           </div>
-
           <div className={styles.wallet}>
             <span>RUB</span>
           </div>
