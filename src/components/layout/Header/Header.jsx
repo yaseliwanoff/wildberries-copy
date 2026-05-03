@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, forwardRef } from "react"
+import { Controller, useForm } from "react-hook-form"
 
 import styles from "./Header.module.scss"
+import "react-phone-number-input/style.css"
 import logo from "../../../../public/asstes/icons/wb-full-white.svg"
 import Camera from "../../icons/Camera"
 import { MapPin, User, ShoppingCart, X, Search } from "lucide-react"
@@ -10,13 +12,29 @@ import Top from "./Top"
 import DefaultModal from "../../ui/Modal/DefaultModal"
 import SearchModal from "../../ui/Modal/SearchModal"
 
+import { phoneNumberSchema } from "../../../features/auth/login/schemas/LoginSchema"
+import { zodResolver } from "@hookform/resolvers/zod"
+import PhoneInput from "react-phone-number-input"
+import { getCountries, getCountryCallingCode } from "react-phone-number-input/input"
 
 const Header = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSearchModalVisible, setIsSearchModalVisible] = useState(false)
   const [headerHeight, setHeaderHeight] = useState(0);
   const [inputValues, setInputValues] = useState("")
+  const [country, setCountry] = useState("RU")
+  const [selectedCountry, setSelectedCountry] = useState("RU");
   const headerRef = useRef(null);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(phoneNumberSchema),
+    defaultValues: {
+      phoneNumber: "",
+    }
+  })
 
   useEffect(() => {
     if (headerRef.current) {
@@ -36,16 +54,62 @@ const Header = () => {
     setInputValues("");
   }
 
+  const onSubmit = (data) => {
+    alert(JSON.stringify(data, null, 2));
+  }
+
+  const getCountryFromValue = (value, defaultCountry) => {
+    if (!value) return defaultCountry;
+    try {
+      const phoneNumber = parsePhoneNumber(value);
+      return phoneNumber?.country || defaultCountry;
+    } catch {
+      return defaultCountry;
+    }
+  }
+
   return (
     <header ref={headerRef} id="header" className={styles.header}>
       <DefaultModal onClose={() => setIsModalVisible(false)} isVisible={isModalVisible}>
-        <h1 className={styles.modal_title}>Войти или создать профиль</h1>
-        <button className={styles.modal_code_btn}>Получить код</button>
-        <div className={styles.modal_description}>
-          <p>
-            Нажимая на кнопку, я соглашаюсь <Link to={"/"}>с правилами пользования торговой площадкой</Link>. <Link to={"/"}>Политика конфиденциальности</Link>
-          </p>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <h1 className={styles.modal_title}>Войти или создать профиль</h1>
+          <div className={styles.field_input_wrapper}>
+            <Controller
+              name="phoneNumber"
+              control={control}
+              render={({ field }) => (
+                <PhoneInput
+                  international
+                  defaultCountry="RU"
+                  country={selectedCountry}
+                  value={field.value || undefined}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    if (value) {
+                      const countryCode = getCountryFromValue(value, selectedCountry);
+                      if (countryCode) setSelectedCountry(countryCode);
+                    }
+                  }}
+                  onCountryChange={(country) => {
+                    if (country) {
+                      setSelectedCountry(country);
+                    }
+                  }}
+                />
+              )}
+            />
+            {errors.phoneNumber && <p style={{
+              color: "red",
+              fontSize: "14px"
+            }}>{errors.phoneNumber.message}</p>}
+          </div>
+          <button type="submit" className={styles.modal_code_btn}>Получить код</button>
+          <div className={styles.modal_description}>
+            <p>
+              Нажимая на кнопку, я соглашаюсь <Link to={"/"}>с правилами пользования торговой площадкой</Link>. <Link to={"/"}>Политика конфиденциальности</Link>
+            </p>
+          </div>
+        </form>
       </DefaultModal>
       <div className="container">
         <Top />
