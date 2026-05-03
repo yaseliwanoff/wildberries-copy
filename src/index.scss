@@ -18,3 +18,8 @@ html, body {
     padding-inline: 20px;
   }
 }
+
+.PhoneInputInput::placeholder {
+  color: #999;
+  opacity: 1;
+}
