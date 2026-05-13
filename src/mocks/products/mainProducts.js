@@ -229,3 +229,5 @@ const productsMock = [
     "tags": ["Бесплатная доставка", "Рассрочка", "Участвует в акции"]
   }
 ];
+
+export default productsMock;
