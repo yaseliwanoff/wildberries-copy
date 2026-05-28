@@ -1,6 +1,9 @@
 import React, { useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import productsMock from "../../mocks/products/mainProducts";
+import MainProductCard from "../../components/products/MainProductCard/MainProductCard";
+
+import "./Home.module.scss";
 
 // TODO: разрабаться что такое виртуализация в react
 // TODO: разобраться как виртуализация помогает в оптимизации и для чего в целом нужна
@@ -8,9 +11,11 @@ import productsMock from "../../mocks/products/mainProducts";
 
 const ProductRows = React.memo(({ product, style }) => (
   <div style={style}>
-    <span>test text</span>
-    <h2>{product.name}</h2>
-    <p>{product.price.base}</p>
+    <MainProductCard
+      title={product.name}
+      image={product.media.images}
+      price={product.price}
+    />
   </div>
 ));
 
@@ -25,21 +30,27 @@ const Home = () => {
 
   return (
     <>
-      <h1>home page, success work</h1>
-      <div ref={parentRef} style={{ height: window.innerHeight, overflow: "auto" }}>
-        <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
-          {virtualizer.getVirtualItems().map((virtualItem) => (
-            <ProductRows
-              key={virtualItem.key}
-              product={productsMock[virtualItem.index]}
-              style={{
-                position: "absolute",
-                top: virtualItem.start,
-                width: "100%",
-                height: virtualItem.size,
-              }}
-            />
-          ))}
+      <div className="main_header">
+        <div
+          ref={parentRef}
+          style={{ height: window.innerHeight, overflow: "auto" }}
+        >
+          <div
+            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
+          >
+            {virtualizer.getVirtualItems().map((virtualItem) => (
+              <ProductRows
+                key={virtualItem.key}
+                product={productsMock[virtualItem.index]}
+                style={{
+                  position: "absolute",
+                  top: virtualItem.start,
+                  width: "100%",
+                  height: virtualItem.size,
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </>
