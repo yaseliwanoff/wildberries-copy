@@ -1,0 +1,39 @@
+.product_card_wrapper {
+  max-width: 217px;
+  height: 420px;
+
+  .product_card_image {
+    width: 217px;
+    height: 289px;
+    border-radius: 15px;
+    background-position: center;
+    background-size: contain;
+  }
+
+  .product_card_info {
+    margin-top: 12px;
+    padding-bottom: 6px;
+
+    .product_card_price {
+      display: flex;
+      align-items: center;
+
+      svg {
+        margin-right: 5px;
+      }
+
+      &_base {
+        color: #f44;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 18px;
+        margin-right: 8px;
+      }
+
+      &_discount {
+        color: #868695;
+        font-size: 14px;
+      }
+    }
+  }
+}
