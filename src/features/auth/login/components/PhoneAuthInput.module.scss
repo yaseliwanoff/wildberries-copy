@@ -1,0 +1,57 @@
+@use "../../../../styles/variables" as vars;
+
+.wrapper {
+  width: 100%;
+}
+
+.phoneInput {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 52px;
+  border: 2px solid #f1f1f5;
+  border-radius: 12px;
+  background: #f1f1f5;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus-within {
+    border-color: vars.$accentColor;
+    background: vars.$white;
+    box-shadow: 0 0 0 3px rgb(167 58 253 / 12%);
+  }
+
+  :global(.PhoneInputCountry) {
+    position: static;
+    align-self: stretch;
+    margin: 0;
+  }
+
+  :global(.PhoneInputInput) {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 14px 14px 14px 12px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #242424;
+    font-size: 16px;
+    line-height: 1;
+
+    &::placeholder {
+      color: #999;
+      opacity: 1;
+    }
+  }
+}
+
+.phoneInputField {
+  width: 100%;
+}
+
+.error {
+  margin: 8px 0 0;
+  color: #fa2b55;
+  font-size: 14px;
+  line-height: 1.3;
+}
