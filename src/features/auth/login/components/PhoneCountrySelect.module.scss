@@ -1,0 +1,165 @@
+@use "../../../../styles/variables" as vars;
+
+.root {
+  position: relative;
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  padding: 0 10px 0 12px;
+  border: 0;
+  border-right: 1px solid #e8e8ef;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgb(167 58 253 / 6%);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+}
+
+.flag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.chevron {
+  color: #868695;
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.rootOpen .trigger {
+  background: rgb(167 58 253 / 8%);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  width: min(320px, 88vw);
+  overflow: hidden;
+  border: 1px solid #ececf1;
+  border-radius: 16px;
+  background: vars.$white;
+  box-shadow: 0 16px 40px rgb(36 36 36 / 12%);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f1f5;
+  color: #868695;
+
+  input {
+    width: 100%;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: vars.$black;
+    font-size: 14px;
+
+    &::placeholder {
+      color: #b6b6c2;
+    }
+  }
+}
+
+.list {
+  max-height: 280px;
+  padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.listInner {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: vars.$black;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #f6f6f9;
+  }
+}
+
+.optionSelected {
+  background: rgb(167 58 253 / 10%);
+
+  .optionCode {
+    color: vars.$accentColor;
+    font-weight: 600;
+  }
+}
+
+.optionFlag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.optionLabel {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.optionCode {
+  color: #868695;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  padding: 20px 12px;
+  color: #868695;
+  font-size: 14px;
+  text-align: center;
+}
