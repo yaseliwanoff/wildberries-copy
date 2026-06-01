@@ -1,9 +1,8 @@
-const currencyValletSymbol = {
-  RUB: "₽",
-};
+import styles from "./MainProductCard.module.scss";
 
-const ProductPrice = ({ price, currency = "RUB" }) => {
-  if (Object.keys(currencyValletSymbol) === currency) {
+const ProductPrice = ({ price }) => {
+  if (!price) {
+    return null;
   }
 
   return (
