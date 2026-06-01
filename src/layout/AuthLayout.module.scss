@@ -1,0 +1,102 @@
+@use "../styles/variables" as vars;
+
+.root {
+  display: grid;
+  min-height: 100vh;
+
+  @media (min-width: 960px) {
+    grid-template-columns: minmax(320px, 1fr) minmax(420px, 560px);
+  }
+}
+
+.promo {
+  display: none;
+  background: vars.$main_gradient;
+  color: vars.$white;
+
+  @media (min-width: 960px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+  }
+}
+
+.promoContent {
+  max-width: 360px;
+}
+
+.promoLogo {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 24px;
+}
+
+.promoText {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px 40px;
+  background: #fff;
+
+  @media (min-width: 960px) {
+    padding: 32px 48px 48px;
+    box-shadow: -8px 0 32px rgb(36 36 36 / 6%);
+  }
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.homeLink {
+  color: vars.$accentColor;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.content {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 32px;
+  padding: 4px;
+  border-radius: 14px;
+  background: #f6f6f9;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 10px;
+  color: #767676;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tabActive {
+  background: vars.$white;
+  color: vars.$black;
+  box-shadow: 0 2px 8px rgb(36 36 36 / 8%);
+}
