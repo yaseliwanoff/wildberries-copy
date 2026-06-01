@@ -1,72 +1,57 @@
-import { useState, useRef, useEffect, forwardRef } from "react"
-import { Controller, useForm } from "react-hook-form"
+import { useState, useRef, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
+import { MapPin, User, ShoppingCart, X, Search } from "lucide-react";
 
-import styles from "./Header.module.scss"
-import "react-phone-number-input/style.css"
-import logo from "../../../../public/asstes/icons/wb-full-white.svg"
-import Camera from "../../icons/Camera"
-import { MapPin, User, ShoppingCart, X, Search } from "lucide-react"
-import { Link } from "react-router-dom"
-
-import Top from "./Top"
-import DefaultModal from "../../ui/Modal/DefaultModal"
-import SearchModal from "../../ui/Modal/SearchModal"
-
-import { phoneNumberSchema } from "../../../features/auth/login/schemas/LoginSchema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import PhoneInput from "react-phone-number-input"
-import { getCountries, getCountryCallingCode } from "react-phone-number-input/input"
+import styles from "./Header.module.scss";
+import logo from "../../../../public/asstes/icons/wb-full-white.svg";
+import Camera from "../../icons/Camera";
+import Top from "./Top";
+import DefaultModal from "../../ui/Modal/DefaultModal";
+import SearchModal from "../../ui/Modal/SearchModal";
+import PhoneAuthInput from "../../../features/auth/login/components/PhoneAuthInput";
+import { phoneNumberSchema } from "../../../features/auth/login/schemas/LoginSchema";
 
 const Header = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isSearchModalVisible, setIsSearchModalVisible] = useState(false)
+  const [isSearchModalVisible, setIsSearchModalVisible] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const [inputValues, setInputValues] = useState("")
-  const [country, setCountry] = useState("RU")
-  const [selectedCountry, setSelectedCountry] = useState("RU");
+  const [inputValues, setInputValues] = useState("");
   const headerRef = useRef(null);
+
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(phoneNumberSchema),
     defaultValues: {
       phoneNumber: "",
-    }
-  })
+    },
+  });
 
   useEffect(() => {
     if (headerRef.current) {
-      setHeaderHeight(headerRef.current.offsetHeight)
+      setHeaderHeight(headerRef.current.offsetHeight);
     }
-  }, [])
+  }, []);
 
   const toggleModalVisible = () => {
-    setIsModalVisible(!isModalVisible)
-  }
+    setIsModalVisible(!isModalVisible);
+  };
 
   const toggleSearchModalVisible = () => {
-    setIsSearchModalVisible(true)
-  }
+    setIsSearchModalVisible(true);
+  };
 
   const clearInputField = () => {
     setInputValues("");
-  }
+  };
 
   const onSubmit = (data) => {
     alert(JSON.stringify(data, null, 2));
-  }
-
-  const getCountryFromValue = (value, defaultCountry) => {
-    if (!value) return defaultCountry;
-    try {
-      const phoneNumber = parsePhoneNumber(value);
-      return phoneNumber?.country || defaultCountry;
-    } catch {
-      return defaultCountry;
-    }
-  }
+  };
 
   return (
     <header ref={headerRef} id="header" className={styles.header}>
@@ -78,35 +63,22 @@ const Header = () => {
               name="phoneNumber"
               control={control}
               render={({ field }) => (
-                <PhoneInput
-                  international
-                  defaultCountry="RU"
-                  country={selectedCountry}
-                  value={field.value || undefined}
-                  onChange={(value) => {
-                    field.onChange(value);
-                    if (value) {
-                      const countryCode = getCountryFromValue(value, selectedCountry);
-                      if (countryCode) setSelectedCountry(countryCode);
-                    }
-                  }}
-                  onCountryChange={(country) => {
-                    if (country) {
-                      setSelectedCountry(country);
-                    }
-                  }}
+                <PhoneAuthInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.phoneNumber?.message}
                 />
               )}
             />
-            {errors.phoneNumber && <p style={{
-              color: "red",
-              fontSize: "14px"
-            }}>{errors.phoneNumber.message}</p>}
           </div>
-          <button type="submit" className={styles.modal_code_btn}>Получить код</button>
+          <button type="submit" className={styles.modal_code_btn}>
+            Получить код
+          </button>
           <div className={styles.modal_description}>
             <p>
-              Нажимая на кнопку, я соглашаюсь <Link to={"/"}>с правилами пользования торговой площадкой</Link>. <Link to={"/"}>Политика конфиденциальности</Link>
+              Нажимая на кнопку, я соглашаюсь{" "}
+              <Link to="/">с правилами пользования торговой площадкой</Link>.{" "}
+              <Link to="/">Политика конфиденциальности</Link>
             </p>
           </div>
         </form>
@@ -119,9 +91,9 @@ const Header = () => {
             <span className={styles["nav-element__burger-line"]}></span>
           </button>
           <div className={styles.header_bottom_search_wrapper}>
-            <input 
-              className={styles.header_bottom_search} 
-              type="text" 
+            <input
+              className={styles.header_bottom_search}
+              type="text"
               placeholder="Найти на Wildberries"
               onClick={toggleSearchModalVisible}
               value={inputValues}
@@ -165,7 +137,7 @@ const Header = () => {
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
