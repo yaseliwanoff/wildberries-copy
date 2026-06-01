@@ -1,18 +1,14 @@
-import React, { useRef } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import productsMock from "../../mocks/products/mainProducts";
 import MainProductCard from "../../components/products/MainProductCard/MainProductCard";
-
-import "./Home.module.scss";
-
-// TODO: разрабаться что такое виртуализация в react
-// TODO: разобраться как виртуализация помогает в оптимизации и для чего в целом нужна
-// TODO: разобраться как работает данный код
+import styles from "./Home.module.scss";
 
 const ProductRows = React.memo(({ product, style }) => (
   <div style={style}>
     <MainProductCard
       title={product.name}
+      brand={product.brand}
       image={product.media.images}
       price={product.price}
     />
@@ -20,40 +16,51 @@ const ProductRows = React.memo(({ product, style }) => (
 ));
 
 const Home = () => {
-  const parentRef = useRef(null);
+  const listRef = useRef(null);
+  const [scrollMargin, setScrollMargin] = useState(0);
 
-  const virtualizer = useVirtualizer({
+  useLayoutEffect(() => {
+    const updateScrollMargin = () => {
+      if (listRef.current) {
+        setScrollMargin(listRef.current.offsetTop);
+      }
+    };
+
+    updateScrollMargin();
+    window.addEventListener("resize", updateScrollMargin);
+
+    return () => window.removeEventListener("resize", updateScrollMargin);
+  }, []);
+
+  const virtualizer = useWindowVirtualizer({
     count: productsMock.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 600,
+    estimateSize: () => 480,
+    overscan: 3,
+    scrollMargin,
   });
 
   return (
-    <>
-      <div className="main_header">
-        <div
-          ref={parentRef}
-          style={{ height: window.innerHeight, overflow: "auto" }}
-        >
-          <div
-            style={{ height: virtualizer.getTotalSize(), position: "relative" }}
-          >
-            {virtualizer.getVirtualItems().map((virtualItem) => (
-              <ProductRows
-                key={virtualItem.key}
-                product={productsMock[virtualItem.index]}
-                style={{
-                  position: "absolute",
-                  top: virtualItem.start,
-                  width: "100%",
-                  height: virtualItem.size,
-                }}
-              />
-            ))}
-          </div>
-        </div>
+    <section ref={listRef} className={styles.main_header}>
+      <div
+        className={styles.list}
+        style={{ height: `${virtualizer.getTotalSize()}px` }}
+      >
+        {virtualizer.getVirtualItems().map((virtualItem) => (
+          <ProductRows
+            key={virtualItem.key}
+            product={productsMock[virtualItem.index]}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: `${virtualItem.size}px`,
+              transform: `translateY(${virtualItem.start - scrollMargin}px)`,
+            }}
+          />
+        ))}
       </div>
-    </>
+    </section>
   );
 };
 

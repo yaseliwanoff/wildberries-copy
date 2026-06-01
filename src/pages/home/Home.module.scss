@@ -3,6 +3,10 @@
   inline-size: 100%;
   margin-block: 0;
   margin-inline: auto;
-  padding-block: 0;
-  padding-inline: 32px;
+  padding-block: 0 32px;
+}
+
+.list {
+  position: relative;
+  width: 100%;
 }
