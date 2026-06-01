@@ -1,44 +1,55 @@
-import React from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import RootLayout from "../layout/RootLayout";
 import AuthLayout from "../layout/AuthLayout";
+import RouteErrorPage from "../components/routing/RouteErrorPage";
+import GuestRoute from "./guards/GuestRoute";
+import { HomePage, LoginPage, NotFoundPage, RegisterPage } from "./lazyPages";
+import { ROUTES, ROUTE_HANDLE } from "./paths";
 
-import Error404Page from "../pages/page404/Page404";
-
-// Реализация ленивой загрузки
-const Home = React.lazy(() => import("../pages/home/Home"));
-const Login = React.lazy(() => import("../pages/auth/Login"));
-const Register = React.lazy(() => import("../pages/auth/Register"));
-
-const routers = createBrowserRouter([
+const router = createBrowserRouter([
   {
-    path: "*",
-    element: <Error404Page />
-  },
-  {
-    path: "/",
+    path: ROUTES.HOME,
     element: <RootLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         index: true,
-        element: <Home />
-      }
-    ]
+        element: <HomePage />,
+        handle: ROUTE_HANDLE.HOME,
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />,
+        handle: ROUTE_HANDLE.NOT_FOUND,
+      },
+    ],
   },
   {
-    path: "/auth",
+    path: ROUTES.AUTH.ROOT,
     element: <AuthLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
-        path: "login",
-        element: <Login />
+        element: <GuestRoute />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to={ROUTES.AUTH.LOGIN} replace />,
+          },
+          {
+            path: "login",
+            element: <LoginPage />,
+            handle: ROUTE_HANDLE.LOGIN,
+          },
+          {
+            path: "register",
+            element: <RegisterPage />,
+            handle: ROUTE_HANDLE.REGISTER,
+          },
+        ],
       },
-      {
-        path: "register",
-        element: <Register />
-      },
-    ]
-  }
+    ],
+  },
 ]);
 
-export default routers
+export default router;
