@@ -41,7 +41,7 @@ function PhoneAuthInput({
           onCountryChange?.(phoneNumber.country);
         }
       } catch {
-        alert("некорректный номер телефона, попробуйте другой");
+        // обработчик
       }
     }
   };
